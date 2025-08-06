@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tiny Explorations</title>
+    <style>
+        body {
+            font-family: 'Courier New', 'Monaco', 'Menlo', monospace;
+            font-weight: 300;
+            background: #FCFCF9;
+            color: #2c2c2c;
+            margin: 0;
+            padding: 40px 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        .card-container {
+            perspective: 1000px;
+            margin-bottom: 40px;
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .card {
+            width: 100%;
+            height: 280px;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s ease;
+            cursor: pointer;
+        }
+        
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
+        
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: white;
+            border: 1px solid #2c2c2c;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backface-visibility: hidden;
+            padding: 30px;
+            box-sizing: border-box;
+        }
+        
+        .card-back {
+            transform: rotateY(180deg);
+        }
+        
+        .card-front h2 {
+            font-weight: 300;
+            font-size: 1.5em;
+            margin: 0;
+            color: #2c2c2c;
+        }
+        
+        .exploration-text {
+            font-size: 1.1em;
+            line-height: 1.8;
+            text-align: left;
+            color: #2c2c2c;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            background: white;
+            color: #2c2c2c;
+            border: 1px solid #2c2c2c;
+            padding: 12px 24px;
+            font-family: 'Courier New', 'Monaco', 'Menlo', monospace;
+            font-weight: 300;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn:hover {
+            background: #2c2c2c;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card-container">
+            <div class="card" id="explorationCard" onclick="flipCard()">
+                <div class="card-face card-front">
+                    <h2>draw a card</h2>
+                </div>
+                <div class="card-face card-back">
+                    <div class="exploration-text" id="explorationText">
+                        <!-- Exploration text will be inserted here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="actions">
+            <button class="btn" onclick="drawNewCard()">draw another card</button>
+            <a href="https://www.are.na/a-sloan/tiny-explorations-for-soft-sabbaticals" class="btn" target="_blank">share your exploration</a>
+        </div>
+    </div>
+
+    <script>
+        const explorations = [
+            "Find three objects that make different sounds when touched. Arrange them in a line. Walk past them slowly, touching each one. Notice the rhythm this creates. Repeat this walking and touching three times, each time at a different speed.",
+            
+            "Look out your nearest window for exactly two minutes. Count how many things move during this time. Make one mark on paper for each moving thing. Arrange these marks to show the pattern of movement you witnessed.",
+            
+            "Choose five small objects from your immediate surroundings. Hold each one for thirty seconds while thinking of a single word. Write these five words in a column. Read them aloud as if they were a poem.",
+            
+            "Walk to the furthest corner of your space. Stand there for one minute and notice what sounds reach you. Return to where you started. Stand for one minute and notice what sounds reach you here. Make two drawings—one for each location's soundscape.",
+            
+            "Collect seven small objects that fit in your palm. Arrange them in order from heaviest to lightest without using a scale—only your hands. Once arranged, pick up each object again and notice if you want to change the order.",
+            
+            "Choose one drawer, box, or container you haven't opened in a while. Open it and remove the first three things your fingers touch. Spend two minutes with each object, remembering why you kept it. Decide which one to keep, which to move, which to release.",
+            
+            "Find a piece of paper and tear it into seven pieces without using scissors or rulers. Arrange these pieces into the shape of something you saw today. Leave this arrangement somewhere you'll encounter it tomorrow.",
+            
+            "Stand in the center of your space. Turn slowly in a complete circle. Notice what catches your eye as you turn. Choose three of these things. Move them slightly—just an inch or two from where they were.",
+            
+            "Fill a container with water. Drop five different small objects into the water, one at a time. Notice the sound each makes. Notice how the water moves. Remove the objects in a different order than you put them in.",
+            
+            "Choose something that has been sitting in the same spot for months. Pick it up and carry it to three different locations in your space. At each stop, notice how it changes the feeling of that place. Return it to its original spot and whisper what it learned from traveling.",
+            
+            "Choose an object that once belonged to someone else—inherited, gifted, or found. Hold it and listen for echoes of its previous life. What story does it carry from before you knew it? Leave it a small note thanking it for its journey to you.",
+            
+            "Find the oldest thing you can see—a tree, building, or well-worn object. Sit with it and imagine all the seasons it has witnessed. Ask it what it knows about patience that you could learn. Record yourself speaking its answer.",
+            
+            "Choose something that makes you curious about how it was made. Hold it and trace its edges, joints, or textures with your fingers. Spend three minutes appreciating the hands and processes that brought it into being.",
+            
+            "Notice something outside that is moving—clouds, leaves, water, people. Mirror this movement with your hands for one minute, then create the opposite movement. Which feels more familiar to your body today?",
+            
+            "Choose a plant, flower, or single leaf. Observe its details for three minutes, then choreograph a 30-second movement sequence that mimics how this plant grows—slow reaching, gentle swaying, patient unfolding. Record yourself performing this plant dance.",
+            
+            "Choose any ordinary object to become a telephone for speaking with someone no longer in a body. Hold it while asking one question you wish you could ask them. Sit quietly and notice what response arises in the silence.",
+            
+            "Look for something that seems forgotten or overlooked in your space. Sit with it for two minutes and imagine what it has witnessed from its quiet position. Create a small offering for it—move it slightly, dust it off, or simply say 'I see you.'",
+            
+            "Find three objects that feel completely different when touched—smooth, rough, soft, cold, warm. Hold one in each hand and let them 'meet' each other through gentle movements. What conversation emerges between different textures?",
+            
+            "Choose something you walk past daily without really noticing. Spend five minutes discovering details you've never seen. Take three photos from different angles, then write one surprising word on paper and place it near the object as a love note.",
+            
+            "Look for the place where two different materials meet—wood and metal, fabric and stone, glass and wood. Place your finger on this boundary and feel what it's like to be a bridge between different worlds.",
+            
+            "Find something that holds water—a cup, bowl, or even a plant pot. Fill it and watch the water settle. Drop something small into it and observe the ripples. What does water want to teach you about receiving and responding?",
+            
+            "Choose an object that has traveled far to reach you—something shipped, carried, or transported. Hold it and imagine its journey across distances. Thank it for all the movement that brought it to this moment with you.",
+            
+            "Notice something that seems to be waiting—a chair, unused door, or book on a shelf. Spend three minutes keeping it company, then create a small sound by humming, tapping, or whistling that expresses what its waiting feels like. Record this waiting song.",
+            
+            "Find a drawer, closet, or box you haven't opened in a while. Before opening it, place your hand on the outside and listen for what memories might be sleeping inside. Open it slowly and greet the first object that calls to you as if it's been waiting to tell you something.",
+            
+            "Choose something that smells like a particular time in your life—a book, piece of clothing, or spice jar. Hold it close and let the scent carry you into that memory. When you're ready, thank this object for being a doorway to your past.",
+            
+            "Look around and notice what might be watching you—a photograph, plant, or window. Turn toward it and take a photo of yourself from its perspective. Then write one sentence about what it might have noticed about you today and read it aloud.",
+            
+            "Find any living plant and sit or stand so you can feel it with the soles of your feet through the ground. Spend five minutes listening not with your ears, but through your feet and whole attention. Record yourself humming what this plant's rhythm feels like.",
+            
+            "Choose an everyday object to become your communication device with someone who has died. Hold it gently while speaking one thing you wish you could tell them. Listen in the quiet that follows, then leave a small offering nearby—a flower, stone, or drawn heart.",
+            
+            "Select something that has witnessed many of your ordinary moments—a chair you sit in, a mug you drink from, a doorknob you touch daily. Hold it and ask what memory it would most want you to revisit. Spend three minutes with whatever surfaces.",
+            
+            "Find the oldest thing you can see and the newest thing near you. Place them together and imagine their conversation about time. What would the old thing tell the new thing about endurance? What would the new thing tell the old about possibility?",
+            
+            "Look for a corner, alcove, or small enclosed space in your home. Sit or stand in it and feel what it's like to be held by this pocket of space. What does this intimate geography want to tell you about shelter and belonging?",
+            
+            "Choose something you've been obsessively noticing lately—a color, shape, or texture. Find three examples in your space, arrange them together, and take a photo. Then create a field recording of sounds that match this obsession's rhythm or mood.",
+            
+            "Select an object that once lived—wood furniture, paper, cotton clothing. Hold it and thank the living thing it came from. Ask what the tree, plant, or fiber wants you to remember about the gift of transformation.",
+            
+            "Look for something that seems to be patiently waiting—an unopened book, an unused instrument, seeds in a packet. Spend two minutes keeping it company in its waiting. What offering can you give to honor its readiness?",
+            
+            "Find a threshold—doorway, edge of light and shadow, or where rooms meet. Stand there and mark this liminal space by tapping gently on both sides three times. Record the difference in sound between the two sides of your threshold.",
+            
+            "Find something small enough to hold in your cupped palms. Close your eyes and explore it completely through touch for two minutes. Open your eyes and see it as if for the first time. What did your hands teach you that your eyes had missed?",
+            
+            "Notice something that moves differently than you do—a plant swaying, water flowing, a pet walking. Try to move your body in the same rhythm and pattern for one minute. What does this other way of moving teach your bones?",
+            
+            "Choose something that holds the scent of time—an old book, inherited jewelry, or weathered wood. Breathe in its smell while imagining all the moments it has absorbed. What stories live in this scent that you'll never fully know?",
+            
+            "Find an object that travels between inside and outside with you—keys, shoes, a jacket. Hold it and appreciate how it bridges your domestic and public worlds. What does it know about transitions that you could learn?",
+            
+            "Look for something that has been shaped by repeated touch—a worn bannister, smooth stone, or soft fabric. Place your hand where others have touched and feel the invisible community of all those hands. Add your touch to this ongoing conversation.",
+            
+            "Select something that contains or holds other things—a bowl, box, or pocket. Empty it completely, then sit with its emptiness for two minutes. What does this container want to tell you about the relationship between holding and letting go?",
+            
+            "Choose the most ordinary object within reach—a paperclip, rubber band, or pen. Spend five minutes discovering everything extraordinary about it. When you're finished, place it somewhere special as an offering to the magic hiding in the mundane.",
+            
+            "Find something forgotten in a pocket, drawer, or bag. Take a photo of it in your palm, then carry it with you for 10 minutes, photographing it in three different locations as if documenting its return to the world.",
+            
+            "Find five small objects that feel like different emotions when you hold them. Arrange them in a line and create an art exhibition in miniature. Write tiny gallery labels describing what each piece represents, then give yourself a private opening by walking through and whispering one word of appreciation to each piece.",
+            
+            "Choose something that has been with you for years—a book, piece of jewelry, or worn object. Write it a brief love letter thanking it for its faithful presence. Read the letter aloud, then fold it and tuck it near the object as a permanent thank you note.",
+            
+            "Select an object that reminds you of someone you miss. Design a simple invitation asking them to visit you in a dream tonight. Decorate it with small drawings or words, then place it under your pillow or on your nightstand.",
+            
+            "Find something that makes you smile when you see it. Sing to it—any song, hummed melody, or made-up tune that feels like appreciation. Record yourself singing to this object, then play it back while looking at the object again.",
+            
+            "Look for three things that are different shades of the same color. Photograph them together, then write a short poem using only words that match their color family—blues might get 'ocean,' 'shadow,' 'forget,' while yellows might get 'butter,' 'laugh,' 'morning.'",
+            
+            "Choose the most traveled object you own—something that has moved with you, been shipped far, or passed through many hands. Create a simple map of its journey by drawing or arranging objects to show its path to you. Take a photo of this map and whisper 'welcome home' to the object.",
+            
+            "Find something that reflects light—a mirror, glass, or shiny surface. Position it to cast light onto a wall or surface, then move your hands to make shadow puppets in this reflected light. Create a one-minute shadow story and narrate it in whispers.",
+            
+            "Choose three objects that make different sounds when touched. Create a 30-second rhythm by tapping them in sequence. Record this sound pattern, then choreograph simple hand movements to accompany your composition.",
+            
+            "Select something that has been in the same place for over a year. Move it to five different spots in your space, spending one minute at each location. Notice how both the object and each space feel different. Return it to its home and ask what it learned about belonging.",
+            
+            "Find something that was once part of the earth—stone, shell, piece of wood, or metal. Hold it and feel its deep history. Spend five minutes as a bridge between this object's ancient past and its present moment with you. What stories want to pass through you?",
+            
+            "Look for something that holds patterns—fabric, wood grain, stone texture, or leaf veins. Trace these patterns with your finger while humming or making small sounds. Let the pattern guide your voice into a simple song.",
+            
+            "Choose something transparent or translucent—glass, plastic, or sheer fabric. Hold it up to different light sources and notice how it transforms what you see. Take photos through it, creating a new way of seeing your familiar space."
+        ];
+        
+        let currentExplorationIndex = -1;
+        let isFlipped = false;
+        
+        function flipCard() {
+            const card = document.getElementById('explorationCard');
+            if (!isFlipped) {
+                drawNewCard();
+            }
+            card.classList.toggle('flipped');
+            isFlipped = !isFlipped;
+        }
+        
+        function drawNewCard() {
+            let newIndex;
+            do {
+                newIndex = Math.floor(Math.random() * explorations.length);
+            } while (newIndex === currentExplorationIndex && explorations.length > 1);
+            
+            currentExplorationIndex = newIndex;
+            document.getElementById('explorationText').textContent = explorations[currentExplorationIndex];
+        }
+        
+        // Initialize with first exploration ready
+        drawNewCard();
+    </script>
+</body>
+</html>
